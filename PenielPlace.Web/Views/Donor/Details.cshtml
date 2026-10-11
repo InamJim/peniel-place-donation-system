@@ -1,0 +1,54 @@
+@model DonorDetailsViewModel
+@{
+    ViewData["Title"] = Model.FullName;
+}
+<header class="page-head row">
+    <div>
+        <h1>@Model.FullName</h1>
+        <p class="lead">
+            @(string.IsNullOrWhiteSpace(Model.Phone) ? "No phone number" : Model.Phone)
+            &nbsp;|&nbsp;
+            @(string.IsNullOrWhiteSpace(Model.Email) ? "No email address" : Model.Email)
+        </p>
+    </div>
+    <a asp-controller="Donation" asp-action="Create" asp-route-donorId="@Model.DonorId" class="btn btn-primary">Record a donation</a>
+</header>
+
+<partial name="_Alerts" />
+
+<p class="summary-line">Total given: <strong>@Fmt.Money(Model.TotalGiven)</strong> across @Model.Donations.Count @(Model.Donations.Count == 1 ? "gift" : "gifts")</p>
+@if (!string.IsNullOrWhiteSpace(Model.Notes))
+{
+    <p class="muted">Notes: @Model.Notes</p>
+}
+
+@if (Model.Donations.Count == 0)
+{
+    <div class="empty">
+        <h2>No donations yet</h2>
+        <p>Once a donation is recorded for @Model.FullName it will appear here with its receipt.</p>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead><tr><th>Date</th><th>Type</th><th>Gift</th><th>Receipt</th></tr></thead>
+        <tbody>
+        @foreach (var d in Model.Donations)
+        {
+            <tr>
+                <td data-label="Date">@Fmt.Date(d.Date)</td>
+                <td data-label="Type">@d.CategoryName</td>
+                <td data-label="Gift">@(d.IsInKind ? d.InKindDescription : Fmt.Money(d.Amount))</td>
+                <td data-label="Receipt">
+                    @if (d.ReceiptId is int rid)
+                    {
+                        <a asp-controller="Receipt" asp-action="Details" asp-route-id="@rid">@d.ReceiptNumber</a>
+                    }
+                    else { <span class="muted">Not issued</span> }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
