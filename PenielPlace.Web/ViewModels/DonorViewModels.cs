@@ -8,6 +8,7 @@ public class DonorFormViewModel
 
     [Required(ErrorMessage = "Enter the donor's full name.")]
     [StringLength(100, ErrorMessage = "The name must be 100 characters or fewer.")]
+    [RegularExpression(@"^[\p{L}\p{M}\s.,'’\-]+$", ErrorMessage = "Use letters, spaces, and ordinary name punctuation only.")]
     [Display(Name = "Full name")]
     public string FullName { get; set; } = "";
 
@@ -22,7 +23,6 @@ public class DonorFormViewModel
     [StringLength(250, ErrorMessage = "Notes must be 250 characters or fewer.")]
     public string? Notes { get; set; }
 
-    /// <summary>Where to go after saving (for example back to the capture form).</summary>
     public string? ReturnUrl { get; set; }
 }
 
