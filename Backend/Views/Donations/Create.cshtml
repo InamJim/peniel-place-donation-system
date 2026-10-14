@@ -1,0 +1,59 @@
+﻿@model DonationRequest
+
+<h1>Record donation</h1>
+
+<section class="panel">
+    <p>
+        Monetary donations are included in totals.
+        In-kind contributions are recorded separately.
+    </p>
+
+    <div asp-validation-summary="All" class="validation"></div>
+
+    <form asp-action="Create" method="post">
+        <label>Donor (optional)</label>
+        <select asp-for="DonorId">
+            <option value="">Unspecified donor</option>
+            @foreach (Donor d in ViewBag.Donors)
+            {
+                <option value="@d.Id">@d.Name</option>
+            }
+        </select>
+
+        <label asp-for="Category">Category</label>
+        <select asp-for="Category">
+            <option value="tithe">Tithe</option>
+            <option value="offering">Offering</option>
+            <option value="once_off_gift">Once-off gift</option>
+            <option value="in_kind">In-kind donation</option>
+        </select>
+
+        <label asp-for="Kind">Donation kind</label>
+        <select asp-for="Kind">
+            <option value="monetary">Monetary</option>
+            <option value="in_kind">In-kind</option>
+        </select>
+
+        <label asp-for="Amount">Amount (R; monetary only)</label>
+        <input asp-for="Amount"
+               type="number"
+               min="0.01"
+               step="0.01" />
+
+        <label asp-for="Description">
+            Description (required for in-kind donations)
+        </label>
+        <input asp-for="Description"
+               placeholder="e.g. groceries, clothing" />
+
+        <label asp-for="ReceivedOn">Date received</label>
+        <input asp-for="ReceivedOn" type="date" />
+
+        <label asp-for="Notes">Notes (optional)</label>
+        <textarea asp-for="Notes"></textarea>
+
+        <button type="submit">
+            Save donation and generate receipt
+        </button>
+    </form>
+</section>

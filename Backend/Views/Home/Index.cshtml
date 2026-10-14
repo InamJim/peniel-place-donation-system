@@ -1,0 +1,53 @@
+﻿@model ReportResult
+
+<h1>Donation dashboard</h1>
+
+<p>
+    Overview of recorded donations. In-kind items are counted
+    separately from monetary donations.
+</p>
+
+<div class="cards">
+    <div class="card">
+        <span>Monetary total</span>
+        <strong>R@((Model.TotalCents / 100m).ToString("N2"))</strong>
+    </div>
+
+    <div class="card">
+        <span>Monetary donations</span>
+        <strong>@Model.MonetaryCount</strong>
+    </div>
+
+    <div class="card">
+        <span>In-kind donations</span>
+        <strong>@Model.InKindCount</strong>
+    </div>
+</div>
+
+<div class="actions">
+    <a class="button"
+       asp-controller="Donations"
+       asp-action="Create">
+        Record donation
+    </a>
+
+    <a class="button secondary"
+       asp-controller="Donors"
+       asp-action="Create">
+        Add donor
+    </a>
+
+    @if (User.IsInRole("admin"))
+    {
+        <a class="button secondary"
+           asp-controller="Reports"
+           asp-action="Index">
+            Reports
+        </a>
+    }
+</div>
+
+<h2>Recent donations</h2>
+
+<partial name="_DonationTable"
+         model="Model.Donations.Take(10).ToList()" />

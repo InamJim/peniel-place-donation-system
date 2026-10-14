@@ -1,0 +1,50 @@
+﻿@model List<Donation>
+
+<div class="page-title">
+    <h1>Donations</h1>
+    <a class="button" asp-action="Create">Record donation</a>
+</div>
+
+<form method="get" class="filters">
+    <div>
+        <label>From</label>
+        <input type="date" name="from" value="@ViewBag.From" />
+    </div>
+
+    <div>
+        <label>To</label>
+        <input type="date" name="to" value="@ViewBag.To" />
+    </div>
+
+    <div>
+        <label>Category</label>
+        <select name="category">
+            <option value="">All categories</option>
+            @foreach (var c in DonationCategories.All)
+            {
+                <option value="@c"
+                        selected="@(ViewBag.Category as string == c)">
+                    @DonationCategories.Label(c)
+                </option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label>Donor</label>
+        <select name="donorId">
+            <option value="">All donors</option>
+            @foreach (Donor d in ViewBag.Donors)
+            {
+                <option value="@d.Id"
+                        selected="@(ViewBag.DonorId is int id && id == d.Id)">
+                    @d.Name
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit">Filter</button>
+</form>
+
+<partial name="_DonationTable" model="Model" />

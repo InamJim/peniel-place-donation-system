@@ -1,0 +1,25 @@
+﻿@model DonorRequest
+
+<h1>Add donor</h1>
+
+<section class="panel">
+    <div asp-validation-summary="All" class="validation"></div>
+
+    <form asp-action="Create" method="post">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name" class="validation"></span>
+
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="validation"></span>
+
+        <label asp-for="Phone"></label>
+        <input asp-for="Phone" />
+
+        <label asp-for="Notes"></label>
+        <textarea asp-for="Notes"></textarea>
+
+        <button type="submit">Save donor</button>
+    </form>
+</section>

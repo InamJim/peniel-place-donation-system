@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Peniel Place Ministries</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <a class="brand"
+           asp-controller="Home"
+           asp-action="Index">
+            Peniel Place Ministries
+        </a>
+
+        <nav>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Home" asp-action="Index">Dashboard</a>
+                <a asp-controller="Donors" asp-action="Index">Donors</a>
+                <a asp-controller="Donations" asp-action="Index">Donations</a>
+
+                @if (User.IsInRole("admin"))
+                {
+                    <a asp-controller="Reports" asp-action="Index">Reports</a>
+                }
+
+                <form asp-controller="Auth"
+                      asp-action="Logout"
+                      method="post"
+                      class="inline">
+                    <button class="link-button" type="submit">
+                        Sign out
+                    </button>
+                </form>
+            }
+        </nav>
+    </header>
+
+    <main>
+        @if (TempData["Success"] is string s)
+        {
+            <div class="alert success">@s</div>
+        }
+
+        @if (TempData["Error"] is string e)
+        {
+            <div class="alert error">@e</div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer>
+        Peniel Place Ministries · Donation Management
+    </footer>
+</body>
+</html>
