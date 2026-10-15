@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# --- Local runtime data: NEVER commit (database + encryption key ring) ---
+Backend/storage/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

@@ -1,21 +1,30 @@
-
+using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PenielPlaceMinistriesCSharp.Models;
-using System.Diagnostics;
 
-namespace PenielPlaceMinistriesCSharp.Controllers
+namespace PenielPlaceMinistriesCSharp.Controllers;
+
+[AllowAnonymous]
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    /// <summary>Sends each visitor to the right starting page for their role.</summary>
+    [HttpGet]
+    public IActionResult Index()
     {
-        public IActionResult Error()
-        {
-            var model = new ErrorViewModel
-            {
-                RequestId = Activity.Current?.Id
-                    ?? HttpContext.TraceIdentifier
-            };
+        if (User.Identity?.IsAuthenticated != true)
+            return RedirectToAction("Login", "Account");
 
-            return View(model);
-        }
+        return User.IsInRole(Roles.Leadership)
+            ? RedirectToAction("Index", "Dashboard")
+            : RedirectToAction("Create", "Donation");
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        ViewData["RequestId"] = requestId;
+        return View(new ErrorViewModel { RequestId = requestId });
     }
 }
