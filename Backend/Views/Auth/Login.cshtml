@@ -1,0 +1,21 @@
+﻿@model LoginRequest
+
+<section class="panel narrow">
+    <h1>Sign in</h1>
+    <p>Access the donation management system.</p>
+
+    <div asp-validation-summary="ModelOnly"
+         class="validation"></div>
+
+    <form asp-action="Login" method="post">
+        <label asp-for="Email">Email address</label>
+        <input asp-for="Email" autocomplete="username" />
+        <span asp-validation-for="Email" class="validation"></span>
+
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" autocomplete="current-password" />
+        <span asp-validation-for="Password" class="validation"></span>
+
+        <button type="submit">Sign in</button>
+    </form>
+</section>

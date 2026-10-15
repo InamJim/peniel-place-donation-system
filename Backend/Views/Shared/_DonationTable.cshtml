@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Donation>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Donor</th>
+                <th>Category</th>
+                <th>Kind</th>
+                <th>Amount / Description</th>
+                <th>Receipt</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>@d.ReceivedOn.ToString("yyyy-MM-dd")</td>
+                    <td>@(d.Donor?.Name ?? "Unspecified")</td>
+                    <td>@DonationCategories.Label(d.Category)</td>
+                    <td>@d.Kind</td>
+                    <td>
+                        @(d.Kind == "monetary"
+                            ? "R" + ((d.AmountCents ?? 0) / 100m).ToString("N2")
+                            : d.Description)
+                    </td>
+                    <td>
+                        @if (d.Receipt != null)
+                        {
+                            <a asp-controller="Receipts"
+                               asp-action="Show"
+                               asp-route-id="@d.Id">
+                                @d.Receipt.ReceiptNumber
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

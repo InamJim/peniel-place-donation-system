@@ -1,0 +1,307 @@
+:root {
+    font-family: Inter, Segoe UI, Arial, sans-serif;
+    color: #262626;
+    background: #f7f6f3;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 5%;
+    background: #fff;
+    border-bottom: 1px solid #e8e5df;
+    flex-wrap: wrap;
+}
+
+.brand {
+    font-weight: 750;
+    color: #382f27;
+    text-decoration: none;
+    font-size: 1.15rem;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+    nav a,
+    .link-button {
+        color: #51483e;
+        text-decoration: none;
+        font: inherit;
+    }
+
+.inline {
+    display: inline;
+}
+
+.link-button {
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    min-height: 70vh;
+}
+
+h1 {
+    font-size: 2rem;
+    margin: .4rem 0 1.2rem;
+}
+
+h2 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+}
+
+.panel {
+    background: #fff;
+    padding: 1.5rem;
+    border: 1px solid #e7e2da;
+    border-radius: 14px;
+    max-width: 760px;
+    margin: 1rem 0;
+}
+
+.narrow {
+    max-width: 460px;
+    margin: 4rem auto;
+}
+
+.panel form {
+    display: grid;
+    gap: .45rem;
+}
+
+label {
+    font-weight: 600;
+    margin-top: .5rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    font: inherit;
+    padding: .7rem;
+    border: 1px solid #cfc8be;
+    border-radius: 7px;
+    background: white;
+    min-height: 42px;
+}
+
+textarea {
+    min-height: 90px;
+}
+
+button,
+.button {
+    display: inline-block;
+    font: inherit;
+    font-weight: 650;
+    background: #4a3b2d;
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: .7rem;
+}
+
+    button:hover,
+    .button:hover {
+        opacity: .9;
+    }
+
+.secondary {
+    background: #eae5dd;
+    color: #342d26;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e8e2d9;
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+}
+
+    .card span {
+        color: #70685f;
+    }
+
+    .card strong {
+        font-size: 1.7rem;
+    }
+
+.actions,
+.page-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #e8e2d9;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: .8rem;
+    border-bottom: 1px solid #eee9e2;
+}
+
+th {
+    background: #f2eee8;
+}
+
+td a {
+    color: #60472e;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+    gap: .8rem;
+    align-items: end;
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #e8e2d9;
+    border-radius: 10px;
+}
+
+    .filters button {
+        margin: 0;
+    }
+
+.validation {
+    color: #a32626;
+    margin: .5rem 0;
+}
+
+    .validation ul {
+        padding-left: 1.2rem;
+    }
+
+.alert {
+    padding: .9rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.success {
+    background: #e4f4e8;
+    color: #1c6331;
+}
+
+.error {
+    background: #fbe8e8;
+    color: #8a2020;
+}
+
+.receipt {
+    max-width: 650px;
+    margin: 2rem auto;
+}
+
+.muted {
+    color: #756e66;
+    margin-top: 2rem;
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: #81796f;
+    font-size: .9rem;
+}
+
+@media (max-width: 760px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+        .filters button {
+            grid-column: 1 / -1;
+        }
+
+    header {
+        align-items: flex-start;
+    }
+
+    nav {
+        gap: .7rem;
+    }
+
+    main {
+        margin: 1.2rem auto;
+    }
+
+    .panel {
+        padding: 1rem;
+    }
+}
+
+@media print {
+    header,
+    footer,
+    button {
+        display: none !important;
+    }
+
+    body,
+    main {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .receipt {
+        border: 0;
+    }
+}
