@@ -1,54 +1,52 @@
 # Peniel Place Donation System
 
-Donation-management application for Peniel Place Ministries. Volunteers capture donors and donations and issue receipts; Leadership has access to administrative dashboards and reporting.
+[![Build and test](https://github.com/Julie-portfolio/peniel-place-donation-system/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Julie-portfolio/peniel-place-donation-system/actions/workflows/dotnet.yml)
 
-**Technology:** ASP.NET Core 8 MVC, Entity Framework Core, ASP.NET Core Identity, SQLite by default, and a responsive/PWA presentation layer.
+A donation-management system for **Peniel Place Ministries**, a church in the community. Volunteers record donations and issue receipts, and church leadership views dashboards and reports. Built for the IIE WIL module (XADAD7112/w) by a four-person team.
 
-## Main features
+**Stack:** ASP.NET Core 8 MVC, Entity Framework Core, ASP.NET Identity, **Azure SQL Database** (cloud), a Progressive Web App (PWA) for mobile, GitHub Actions for CI.
 
-- Donor capture and lookup
-- Donation capture and voiding with a reason
-- Receipt generation and viewing
-- Leadership dashboard, reports and CSV export
-- Role-based authorization: `Volunteer` and `Leadership`
-- Authenticator-app two-factor authentication
-- Protection of donor and donation fields using ASP.NET Core Data Protection
-- Antiforgery protection, validation, authentication rate limiting and safe exception handling
+## Features
 
-## Project layout
+- Record donations and issue receipts
+- Donor records with search and lookup
+- Dashboard, reports and CSV export (leadership only)
+- Role-based access: Volunteer and Leadership
+- Two-factor authentication (authenticator app) for every account
+- Donor and donation data encrypted at rest
+- Void a donation with a reason (donations are never deleted)
+- Desktop and mobile: responsive design, installable as a PWA, offline page
 
-See [`Backend/Documentation/ARCHITECTURE.md`](Backend/Documentation/ARCHITECTURE.md) for the requested layer-by-layer breakdown.
+## Project structure
 
-- `Backend/PresentationLayer/` — controllers, Razor views, view models and static UI assets
-- `Backend/BusinessLogicLayer/` — donor/donation/receipt/report services and security helpers
-- `Backend/DataAccessLayer/` — EF Core `AppDbContext`
-- `Backend/Models/` — domain and application models
-- `Backend/Database/` — database setup and migration guidance
-- `Backend/Documentation/` — architecture, roles and setup documentation
-
-This is a folder-based layered architecture in a single web project, not a multi-project deployment.
-
-## Run locally
-
-Install the .NET 8 SDK, then from the repository root run:
-
-```powershell
-dotnet restore Backend/PenielPlaceMinistries.csproj
-dotnet build Backend/PenielPlaceMinistries.csproj
-dotnet run --project Backend/PenielPlaceMinistries.csproj
+```
+Backend/
+  Controllers/    Handle requests (Account, Dashboard, Donation, Donor, Receipt, Report)
+  Services/       Business logic (donations, donors, receipts, reporting)
+  Models/         Entities (database tables)
+  ViewModels/     Data passed to the views
+  Data/           AppDbContext (EF Core, Azure SQL)
+  Security/       Field encryption, account seeding, safe error handling
+  Views/          Razor pages
+  wwwroot/        CSS, JS, icons, PWA manifest and service worker
+.github/workflows/dotnet.yml    CI build pipeline
 ```
 
-By default, the application uses SQLite at `Backend/storage/peniel.sqlite`. You can override the connection string with the `ConnectionStrings:Default` configuration key. Keep the database file and `Backend/storage/keys` Data Protection key ring backed up together. Neither belongs in source control.
+## Run it locally
 
-For local development, the first Leadership account is seeded as `leader@peniel.local` with the development-only password `Dev-Only-Change-Me-123!` if no Leadership account exists and no bootstrap credentials are configured. **Do not use this credential outside local development.** For an explicitly configured first account, see [`Backend/Documentation/ROLES-AND-ACCOUNT-SETUP.md`](Backend/Documentation/ROLES-AND-ACCOUNT-SETUP.md).
+You need the .NET 8 SDK. The app uses an Azure SQL database, so you need its connection string. **Never commit the connection string**: this repository is public. Store it in user secrets:
 
-## Security notes
+```bash
+cd Backend
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:Default" "<your Azure SQL connection string>"
+dotnet run --launch-profile https       # https://localhost:7120
+```
 
-- Public volunteer self-registration is disabled. Leadership creates volunteer accounts because the application handles personal and financial data.
-- All accounts must complete authenticator-app two-factor setup before receiving an authenticated session.
-- Never commit real passwords, database connection strings, donor data, SQLite databases, or Data Protection keys.
-- Database schema creation currently uses `EnsureCreated`. Before production schema upgrades, introduce and review EF Core migrations; see `Backend/Database/README.md`.
+Your IP address must be allowed in the Azure SQL server firewall. On first start the app creates the tables and seeds the roles and the four gift categories.
 
-## Verification
+### First sign-in
 
-Run `dotnet build Backend/PenielPlaceMinistries.csproj` and manually test login, initial 2FA setup, subsequent 2FA login, volunteer creation, role restrictions, donor capture, donation capture, receipt generation, reports, and logout. A build/test result should be confirmed on a machine with the .NET 8 SDK before this is described as verified.
+| Environment | Leadership account |
+|-|-|
+| **Development** | `leader@peniel.local` / `Dev-Only-Change-Me-123!` (seeded
