@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PenielPlaceMinistriesCSharp.Models;
@@ -11,6 +12,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<DonationCategory> DonationCategories => Set<DonationCategory>();
     public DbSet<DonationRecord> Donations => Set<DonationRecord>();
     public DbSet<Receipt> Receipts => Set<Receipt>();
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

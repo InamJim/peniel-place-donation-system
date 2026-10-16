@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,15 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PenielPlaceMinistriesCSharp</RootNamespace>
     <WebRoot>PresentationLayer/wwwroot</WebRoot>
+    <UserSecretsId>706f5641-95f4-4646-b00f-de628e305ce4</UserSecretsId>
   </PropertyGroup>
 
-  <!--
-    The project was reorganized into PresentationLayer, BusinessLogicLayer, and
-    DataAccessLayer. If this archive is extracted over an older checkout, legacy
-    source folders may still exist. Exclude those old copies so a class is compiled
-    only from its new authoritative location. These Remove rules are harmless in a
-    clean checkout where the legacy folders are absent.
-  -->
+
   <ItemGroup>
     <Compile Remove="Controllers/**/*.cs" />
     <Compile Remove="Data/**/*.cs" />
@@ -24,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
   </ItemGroup>
 

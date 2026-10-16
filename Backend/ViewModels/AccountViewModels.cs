@@ -18,6 +18,29 @@ public class LoginViewModel
     public string? ReturnUrl { get; set; }
 }
 
+public class RegisterRequest
+{
+    [Required(ErrorMessage = "Enter your full name.")]
+    [StringLength(100, ErrorMessage = "The name must be 100 characters or fewer.")]
+    [Display(Name = "Name")]
+    public string Name { get; set; } = "";
+
+    [Required(ErrorMessage = "Enter your email address.")]
+    [EmailAddress(ErrorMessage = "Enter a valid email address, like name@example.com.")]
+    [StringLength(254)]
+    public string Email { get; set; } = "";
+
+    [Required(ErrorMessage = "Enter a password.")]
+    [DataType(DataType.Password)]
+    [StringLength(128, MinimumLength = 12, ErrorMessage = "The password must be at least 12 characters.")]
+    public string Password { get; set; } = "";
+
+    [Required(ErrorMessage = "Confirm your password.")]
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "The password and confirmation do not match.")]
+    public string ConfirmPassword { get; set; } = "";
+}
+
 public class TwoFactorViewModel
 {
     [Required(ErrorMessage = "Enter the 6-digit code.")]
