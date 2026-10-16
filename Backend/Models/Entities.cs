@@ -1,115 +1,105 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace PenielPlaceMinistriesCSharp.Models;
 
-public static class DonationCategories
+public static class Roles
 {
-    public const string Tithe = "tithe";
-    public const string Offering = "offering";
-    public const string OnceOffGift = "once_off_gift";
-    public const string InKind = "in_kind";
+    public const string Volunteer = "Volunteer";
+    public const string Leadership = "Leadership";
+    public const string Staff = Volunteer + "," + Leadership;
+    public static readonly string[] All = [Volunteer, Leadership];
+}
+public static class PaymentMethods
+{
+    public static readonly string[] All = ["Cash", "EFT / bank transfer", "Card", "Other"];
 
-    public static readonly string[] All =
-    [
-        Tithe,
-        Offering,
-        OnceOffGift,
-        InKind
-    ];
-
-    public static string Label(string value) => value switch
-    {
-        Tithe => "Tithe",
-        Offering => "Offering",
-        OnceOffGift => "Once-off gift",
-        InKind => "In-kind donation",
-        _ => value
-    };
+    public static bool IsValid ( string? value ) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        All.Contains(value.Trim(), StringComparer.OrdinalIgnoreCase);
 }
 
-public class User
+public sealed class ApplicationUser : IdentityUser
 {
-    public int Id { get; set; }
-
-    [Required, MaxLength(150)]
-    public string Name { get; set; } = "";
-
-    [Required, EmailAddress, MaxLength(254)]
-    public string Email { get; set; } = "";
-
-    [Required]
-    public string PasswordHash { get; set; } = "";
-
-    [Required]
-    public string Role { get; set; } = "volunteer";
-
-    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+    [MaxLength(100)]
+    public string? DisplayName { get; set; }
 }
 
-public class Donor
+public sealed class Donor
 {
-    public int Id { get; set; }
+    public int DonorId { get; set; }
 
-    [Required, MaxLength(150)]
-    public string Name { get; set; } = "";
+    [Required, MaxLength(1024)]
+    public string FullNameProtected { get; set; } = string.Empty;
 
-    [EmailAddress, MaxLength(254)]
-    public string? Email { get; set; }
+    [MaxLength(1024)]
+    public string? EmailProtected { get; set; }
 
-    [MaxLength(40)]
-    public string? Phone { get; set; }
+    [MaxLength(512)]
+    public string? PhoneProtected { get; set; }
 
-    [MaxLength(2000)]
-    public string? Notes { get; set; }
+    [MaxLength(2048)]
+    public string? NotesProtected { get; set; }
 
-    public int CreatedById { get; set; }
-    public User? CreatedBy { get; set; }
+    public string? CreatedById { get; set; }
 
-    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
-    public List<Donation> Donations { get; set; } = [];
+    public ICollection<DonationRecord> Donations { get; set; } = new List<DonationRecord>();
 }
 
-public class Donation
+public sealed class DonationCategory
 {
-    public int Id { get; set; }
+    public int DonationCategoryId { get; set; }
 
+    [Required, MaxLength(80)]
+    public string Name { get; set; } = string.Empty;
+
+    public bool IsInKind { get; set; }
+    public bool IsActive { get; set; } = true;
+
+    public ICollection<DonationRecord> Donations { get; set; } = new List<DonationRecord>();
+}
+
+public sealed class DonationRecord
+{
+    public int DonationId { get; set; }
+    public DateTime Date { get; set; }
+    public int DonationCategoryId { get; set; }
+    public DonationCategory Category { get; set; } = null!;
     public int? DonorId { get; set; }
     public Donor? Donor { get; set; }
+    public bool IsAnonymous { get; set; }
 
-    [Required]
-    public string Category { get; set; } = "";
 
-    [Required]
-    public string Kind { get; set; } = "monetary";
-
-    public long? AmountCents { get; set; }
-
-    [MaxLength(1000)]
-    public string? Description { get; set; }
-
-    public DateOnly ReceivedOn { get; set; }
-
-    [MaxLength(2000)]
-    public string? Notes { get; set; }
-
-    public int CreatedById { get; set; }
-    public User? CreatedBy { get; set; }
-
-    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
-
+    [MaxLength(256)]
+    public string? AmountProtected { get; set; }
+    [MaxLength(1024)]
+    public string? InKindDescriptionProtected { get; set; }
+    [MaxLength(256)]
+    public string? PaymentMethodProtected { get; set; }
+    [MaxLength(2048)]
+    public string? NotesProtected { get; set; }
+    public string? CreatedById { get; set; }
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public bool IsVoided { get; set; }
+    public DateTime? VoidedUtc { get; set; }
+    public string? VoidedById { get; set; }
+    [MaxLength(200)]
+    public string? VoidedByName { get; set; }
+    [MaxLength(1024)]
+    public string? VoidReasonProtected { get; set; }
     public Receipt? Receipt { get; set; }
 }
 
-public class Receipt
+public sealed class Receipt
 {
-    public int Id { get; set; }
-
+    public int ReceiptId { get; set; }
     public int DonationId { get; set; }
-    public Donation? Donation { get; set; }
-
+    public DonationRecord? Donation { get; set; }
     [Required, MaxLength(40)]
-    public string ReceiptNumber { get; set; } = "";
-
+    public string ReceiptNumber { get; set; } = string.Empty;
     public DateTime IssuedAtUtc { get; set; } = DateTime.UtcNow;
+    [MaxLength(200)]
+    public string IssuedBy { get; set; } = string.Empty;
 }

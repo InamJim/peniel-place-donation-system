@@ -1,18 +1,11 @@
-﻿
-@model PenielPlaceMinistriesCSharp.Models.ErrorViewModel
-
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Something went wrong";
+    Layout = "_AuthLayout";
 }
-
-<h1>An error occurred.</h1>
-
-<p>Sorry, your request could not be completed.</p>
-
-@if (Model?.ShowRequestId == true)
+<h1>Something went wrong</h1>
+<p class="lead">The page could not be shown. Nothing you entered has been lost on the server. Try again, and if it keeps happening, tell a church leader.</p>
+@if (ViewData["RequestId"] is string requestId)
 {
-    <p>
-        <strong>Request ID:</strong>
-        <code>@Model.RequestId</code>
-    </p>
+    <p class="muted small">Reference for support: <code>@requestId</code></p>
 }
+<a class="btn btn-primary" href="/">Go back to the start</a>

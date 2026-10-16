@@ -1,97 +1,85 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PenielPlaceMinistriesCSharp.Models;
-using System.Reflection.Emit;
 
 namespace PenielPlaceMinistriesCSharp.Data;
 
-public class AppDbContext(
-    DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+    : IdentityDbContext<ApplicationUser>(options)
 {
-    public DbSet<User> Users => Set<User>();
     public DbSet<Donor> Donors => Set<Donor>();
-    public DbSet<Donation> Donations => Set<Donation>();
+    public DbSet<DonationCategory> DonationCategories => Set<DonationCategory>();
+    public DbSet<DonationRecord> Donations => Set<DonationRecord>();
     public DbSet<Receipt> Receipts => Set<Receipt>();
 
-    protected override void OnModelCreating(ModelBuilder b)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        b.Entity<User>().HasIndex(x => x.Email).IsUnique();
+        base.OnModelCreating(builder);
 
-        b.Entity<User>()
-            .Property(x => x.Email)
-            .UseCollation("NOCASE");
-
-        b.Entity<Donor>()
-            .HasOne(x => x.CreatedBy)
-            .WithMany()
-            .HasForeignKey(x => x.CreatedById)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        b.Entity<Donation>()
-            .HasOne(x => x.Donor)
-            .WithMany(x => x.Donations)
-            .HasForeignKey(x => x.DonorId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        b.Entity<Donation>()
-            .HasOne(x => x.CreatedBy)
-            .WithMany()
-            .HasForeignKey(x => x.CreatedById)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        b.Entity<Donation>()
-            .HasOne(x => x.Receipt)
-            .WithOne(x => x.Donation)
-            .HasForeignKey<Receipt>(x => x.DonationId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        b.Entity<Receipt>()
-            .HasIndex(x => x.DonationId)
-            .IsUnique();
-
-        b.Entity<Receipt>()
-            .HasIndex(x => x.ReceiptNumber)
-            .IsUnique();
-
-        b.Entity<Donation>()
-            .Property(x => x.AmountCents)
-            .IsRequired(false);
-    }
-}
-
-public static class SeedData
-{
-    public static async Task SeedAsync(IServiceProvider sp)
-    {
-        var db = sp.GetRequiredService<AppDbContext>();
-
-        var hasher = sp.GetRequiredService<
-            Microsoft.AspNetCore.Identity.IPasswordHasher<User>>();
-
-        if (await db.Users.AnyAsync())
-            return;
-
-        var admin = new User
+        builder.Entity<Donor>(e =>
         {
-            Name = "Ministry Administrator",
-            Email = "admin@peniel.local",
-            Role = "admin"
-        };
+            e.HasKey(x => x.DonorId);
+            e.Property(x => x.FullNameProtected).HasMaxLength(1024).IsRequired();
+            e.Property(x => x.EmailProtected).HasMaxLength(1024);
+            e.Property(x => x.PhoneProtected).HasMaxLength(512);
+            e.Property(x => x.NotesProtected).HasMaxLength(2048);
+            e.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
-        admin.PasswordHash = hasher.HashPassword(
-            admin, "ChangeMe123!");
-
-        var volunteer = new User
+        builder.Entity<DonationCategory>(e =>
         {
-            Name = "Sample Volunteer",
-            Email = "volunteer@peniel.local",
-            Role = "volunteer"
-        };
+            e.HasKey(x => x.DonationCategoryId);
+            e.Property(x => x.Name).HasMaxLength(80).IsRequired();
+            e.HasIndex(x => x.Name).IsUnique();
+            e.HasData(
+                new DonationCategory { DonationCategoryId = 1, Name = "Tithe", IsInKind = false, IsActive = true },
+                new DonationCategory { DonationCategoryId = 2, Name = "Offering", IsInKind = false, IsActive = true },
+                new DonationCategory { DonationCategoryId = 3, Name = "Once-off gift", IsInKind = false, IsActive = true },
+                new DonationCategory { DonationCategoryId = 4, Name = "In-kind donation", IsInKind = true, IsActive = true });
+        });
 
-        volunteer.PasswordHash = hasher.HashPassword(
-            volunteer, "Volunteer123!");
+        builder.Entity<DonationRecord>(e =>
+        {
+            e.HasKey(x => x.DonationId);
+            e.Property(x => x.AmountProtected).HasMaxLength(256);
+            e.Property(x => x.InKindDescriptionProtected).HasMaxLength(1024);
+            e.Property(x => x.PaymentMethodProtected).HasMaxLength(256);
+            e.Property(x => x.NotesProtected).HasMaxLength(2048);
+            e.Property(x => x.VoidedByName).HasMaxLength(200);
+            e.Property(x => x.VoidReasonProtected).HasMaxLength(1024);
+            e.HasIndex(x => x.Date);
 
-        db.Users.AddRange(admin, volunteer);
+            e.HasOne(x => x.Category)
+                .WithMany(x => x.Donations)
+                .HasForeignKey(x => x.DonationCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-        await db.SaveChangesAsync();
+            e.HasOne(x => x.Donor)
+                .WithMany(x => x.Donations)
+                .HasForeignKey(x => x.DonorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(x => x.Receipt)
+                .WithOne(x => x.Donation)
+                .HasForeignKey<Receipt>(x => x.DonationId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Receipt>(e =>
+        {
+            e.HasKey(x => x.ReceiptId);
+            e.Property(x => x.ReceiptNumber).HasMaxLength(40).IsRequired();
+            e.Property(x => x.IssuedBy).HasMaxLength(200);
+            e.HasIndex(x => x.DonationId).IsUnique();
+            e.HasIndex(x => x.ReceiptNumber).IsUnique();
+        });
     }
 }
