@@ -1,63 +1,54 @@
 # Peniel Place Donation System
 
-ASP.NET Core 8 MVC app for recording donations, issuing receipts and reporting.
-Runtime project: "Backend/" (SQLite). Open "PenielPlace.Web.sln" or run from the command line.
+Donation-management application for Peniel Place Ministries. Volunteers capture donors and donations and issue receipts; Leadership has access to administrative dashboards and reporting.
 
-## Run it
+**Technology:** ASP.NET Core 8 MVC, Entity Framework Core, ASP.NET Core Identity, SQLite by default, and a responsive/PWA presentation layer.
 
-```bash
-cd Backend
-dotnet run --launch-profile http        # http://localhost:5091
+## Main features
+
+- Donor capture and lookup
+- Donation capture and voiding with a reason
+- Receipt generation and viewing
+- Leadership dashboard, reports and CSV export
+- Role-based authorization: `Volunteer` and `Leadership`
+- Authenticator-app two-factor authentication
+- Protection of donor and donation fields using ASP.NET Core Data Protection
+- Antiforgery protection, validation, authentication rate limiting and safe exception handling
+
+## Project layout
+
+See [`Backend/Documentation/ARCHITECTURE.md`](Backend/Documentation/ARCHITECTURE.md) for the requested layer-by-layer breakdown.
+
+- `Backend/PresentationLayer/` — controllers, Razor views, view models and static UI assets
+- `Backend/BusinessLogicLayer/` — donor/donation/receipt/report services and security helpers
+- `Backend/DataAccessLayer/` — EF Core `AppDbContext`
+- `Backend/Models/` — domain and application models
+- `Backend/Database/` — database setup and migration guidance
+- `Backend/Documentation/` — architecture, roles and setup documentation
+
+This is a folder-based layered architecture in a single web project, not a multi-project deployment.
+
+## Run locally
+
+Install the .NET 8 SDK, then from the repository root run:
+
+```powershell
+dotnet restore Backend/PenielPlaceMinistries.csproj
+dotnet build Backend/PenielPlaceMinistries.csproj
+dotnet run --project Backend/PenielPlaceMinistries.csproj
 ```
 
-First start creates "Backend/storage/" (SQLite database + encryption key ring) and seeds the
-roles and the four gift categories.
+By default, the application uses SQLite at `Backend/storage/peniel.sqlite`. You can override the connection string with the `ConnectionStrings:Default` configuration key. Keep the database file and `Backend/storage/keys` Data Protection key ring backed up together. Neither belongs in source control.
 
-### First sign-in
+For local development, the first Leadership account is seeded as `leader@peniel.local` with the development-only password `Dev-Only-Change-Me-123!` if no Leadership account exists and no bootstrap credentials are configured. **Do not use this credential outside local development.** For an explicitly configured first account, see [`Backend/Documentation/ROLES-AND-ACCOUNT-SETUP.md`](Backend/Documentation/ROLES-AND-ACCOUNT-SETUP.md).
 
-|Environment|Leadership account|
-|-|-|
-|**Development**|"leader@peniel.local" / "Dev-Only-Change-Me-123!" (seeded automatically, only in Development)|
-|**Anything else**|Set "BootstrapAdmin\_\_Email" and "BootstrapAdmin\_\_Password" before first start|
+## Security notes
 
-Every account must set up an authenticator app (TOTP) on first sign-in (QR code or typed key).
-Leadership can then add volunteers from **Add volunteer** in the side menu.
+- Public volunteer self-registration is disabled. Leadership creates volunteer accounts because the application handles personal and financial data.
+- All accounts must complete authenticator-app two-factor setup before receiving an authenticated session.
+- Never commit real passwords, database connection strings, donor data, SQLite databases, or Data Protection keys.
+- Database schema creation currently uses `EnsureCreated`. Before production schema upgrades, introduce and review EF Core migrations; see `Backend/Database/README.md`.
 
-```bash
-# example: secrets instead of the dev account
-cd Backend
-dotnet user-secrets init
-dotnet user-secrets set "BootstrapAdmin:Email" "you@church.org"
-dotnet user-secrets set "BootstrapAdmin:Password" "a-long-Passw0rd!-here"
-```
+## Verification
 
-## Roles
-
-||Volunteer|Leadership|
-|-|-|-|
-|Record donations, issue/view receipts|yes|yes|
-|Look up / add donors, browse donations|yes|yes|
-|Dashboard, reports, CSV export|no|yes|
-|Add volunteer accounts|no|yes|
-|**Void a donation** (with a reason)|no|yes|
-
-### Voiding donations
-
-Donations are never deleted. Leadership can **void** one from the *Donations* list or its receipt page.
-A reason (5-250 characters) is required and is stored encrypted, together with who voided it and when.
-A voided donation stays visible, marked **VOID** (its receipt shows a VOID banner), and is excluded from donor totals,
-the dashboard, reports and CSV exports. Voiding cannot be undone: to correct a mistake, void it and record a new donation.
-
-## Data protection - read this
-
-* Donor names/contacts and donation amounts/descriptions/notes are **encrypted at rest** with
-ASP.NET Core Data Protection. The keys live in "Backend/storage/keys".
-
-## Production checklist
-
-* Serve over HTTPS (cookies are "Secure" outside Development).
-* Set "AllowedHosts" in "appsettings.json" to your real host name(s).
-* Set "BootstrapAdmin" credentials, then remove them from the environment after the first start.
-* Schema is created with "EnsureCreated" (same approach as the original Backend). Changing entities later
-needs EF migrations or a fresh database.
-
+Run `dotnet build Backend/PenielPlaceMinistries.csproj` and manually test login, initial 2FA setup, subsequent 2FA login, volunteer creation, role restrictions, donor capture, donation capture, receipt generation, reports, and logout. A build/test result should be confirmed on a machine with the .NET 8 SDK before this is described as verified.

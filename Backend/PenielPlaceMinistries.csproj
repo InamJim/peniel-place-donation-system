@@ -5,7 +5,23 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PenielPlaceMinistriesCSharp</RootNamespace>
+    <WebRoot>PresentationLayer/wwwroot</WebRoot>
   </PropertyGroup>
+
+  <!--
+    The project was reorganized into PresentationLayer, BusinessLogicLayer, and
+    DataAccessLayer. If this archive is extracted over an older checkout, legacy
+    source folders may still exist. Exclude those old copies so a class is compiled
+    only from its new authoritative location. These Remove rules are harmless in a
+    clean checkout where the legacy folders are absent.
+  -->
+  <ItemGroup>
+    <Compile Remove="Controllers/**/*.cs" />
+    <Compile Remove="Data/**/*.cs" />
+    <Compile Remove="Security/**/*.cs" />
+    <Compile Remove="Services/**/*.cs" />
+    <Compile Remove="ViewModels/**/*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
