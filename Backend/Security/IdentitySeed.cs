@@ -42,14 +42,15 @@ public static class IdentitySeed
                 return;
             }
 
-            // Development convenience only: seed a throw-away leader if none exists.
-            if ((await userManager.GetUsersInRoleAsync(Roles.Leadership)).Count > 0) return;
-
-            email = DevEmail;
-            password = DevPassword;
-            logger.LogWarning(
-                "Development mode: seeding Leadership account {Email} with the documented dev password. " +
-                "Configure BootstrapAdmin for anything other than local development.", DevEmail);
+            // Development convenience removed: do not auto-seed any Leadership account.
+            // If no BootstrapAdmin credentials are configured, exit and log a warning.
+            if (!environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "No BootstrapAdmin credentials configured. If no Leadership account exists yet, " +
+                    "set BootstrapAdmin:Email and BootstrapAdmin:Password and restart.");
+            }
+            return;
         }
 
         var user = await userManager.FindByEmailAsync(email);
