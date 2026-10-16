@@ -4,7 +4,7 @@ using PenielPlaceMinistriesCSharp.Models;
 
 namespace PenielPlaceMinistriesCSharp.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+public sealed class AppDbContext ( DbContextOptions<AppDbContext> options )
     : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Donor> Donors => Set<Donor>();
@@ -12,7 +12,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<DonationRecord> Donations => Set<DonationRecord>();
     public DbSet<Receipt> Receipts => Set<Receipt>();
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating ( ModelBuilder builder )
     {
         base.OnModelCreating(builder);
 
