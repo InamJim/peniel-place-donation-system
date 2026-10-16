@@ -1,63 +1,52 @@
 # Peniel Place Donation System
 
-ASP.NET Core 8 MVC app for recording donations, issuing receipts and reporting.
-Runtime project: "Backend/" (SQLite). Open "PenielPlace.Web.sln" or run from the command line.
+[![Build and test](https://github.com/Julie-portfolio/peniel-place-donation-system/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Julie-portfolio/peniel-place-donation-system/actions/workflows/dotnet.yml)
 
-## Run it
+A donation-management system for **Peniel Place Ministries**, a church in the community. Volunteers record donations and issue receipts, and church leadership views dashboards and reports. Built for the IIE WIL module (XADAD7112/w) by a four-person team.
+
+**Stack:** ASP.NET Core 8 MVC, Entity Framework Core, ASP.NET Identity, **Azure SQL Database** (cloud), a Progressive Web App (PWA) for mobile, GitHub Actions for CI.
+
+## Features
+
+- Record donations and issue receipts
+- Donor records with search and lookup
+- Dashboard, reports and CSV export (leadership only)
+- Role-based access: Volunteer and Leadership
+- Two-factor authentication (authenticator app) for every account
+- Donor and donation data encrypted at rest
+- Void a donation with a reason (donations are never deleted)
+- Desktop and mobile: responsive design, installable as a PWA, offline page
+
+## Project structure
+
+```
+Backend/
+  Controllers/    Handle requests (Account, Dashboard, Donation, Donor, Receipt, Report)
+  Services/       Business logic (donations, donors, receipts, reporting)
+  Models/         Entities (database tables)
+  ViewModels/     Data passed to the views
+  Data/           AppDbContext (EF Core, Azure SQL)
+  Security/       Field encryption, account seeding, safe error handling
+  Views/          Razor pages
+  wwwroot/        CSS, JS, icons, PWA manifest and service worker
+.github/workflows/dotnet.yml    CI build pipeline
+```
+
+## Run it locally
+
+You need the .NET 8 SDK. The app uses an Azure SQL database, so you need its connection string. **Never commit the connection string**: this repository is public. Store it in user secrets:
 
 ```bash
 cd Backend
-dotnet run --launch-profile http        # http://localhost:5091
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:Default" "<your Azure SQL connection string>"
+dotnet run --launch-profile https       # https://localhost:7120
 ```
 
-First start creates "Backend/storage/" (SQLite database + encryption key ring) and seeds the
-roles and the four gift categories.
+Your IP address must be allowed in the Azure SQL server firewall. On first start the app creates the tables and seeds the roles and the four gift categories.
 
 ### First sign-in
 
-|Environment|Leadership account|
+| Environment | Leadership account |
 |-|-|
-|**Development**|"leader@peniel.local" / "Dev-Only-Change-Me-123!" (seeded automatically, only in Development)|
-|**Anything else**|Set "BootstrapAdmin\_\_Email" and "BootstrapAdmin\_\_Password" before first start|
-
-Every account must set up an authenticator app (TOTP) on first sign-in (QR code or typed key).
-Leadership can then add volunteers from **Add volunteer** in the side menu.
-
-```bash
-# example: secrets instead of the dev account
-cd Backend
-dotnet user-secrets init
-dotnet user-secrets set "BootstrapAdmin:Email" "you@church.org"
-dotnet user-secrets set "BootstrapAdmin:Password" "a-long-Passw0rd!-here"
-```
-
-## Roles
-
-||Volunteer|Leadership|
-|-|-|-|
-|Record donations, issue/view receipts|yes|yes|
-|Look up / add donors, browse donations|yes|yes|
-|Dashboard, reports, CSV export|no|yes|
-|Add volunteer accounts|no|yes|
-|**Void a donation** (with a reason)|no|yes|
-
-### Voiding donations
-
-Donations are never deleted. Leadership can **void** one from the *Donations* list or its receipt page.
-A reason (5-250 characters) is required and is stored encrypted, together with who voided it and when.
-A voided donation stays visible, marked **VOID** (its receipt shows a VOID banner), and is excluded from donor totals,
-the dashboard, reports and CSV exports. Voiding cannot be undone: to correct a mistake, void it and record a new donation.
-
-## Data protection - read this
-
-* Donor names/contacts and donation amounts/descriptions/notes are **encrypted at rest** with
-ASP.NET Core Data Protection. The keys live in "Backend/storage/keys".
-
-## Production checklist
-
-* Serve over HTTPS (cookies are "Secure" outside Development).
-* Set "AllowedHosts" in "appsettings.json" to your real host name(s).
-* Set "BootstrapAdmin" credentials, then remove them from the environment after the first start.
-* Schema is created with "EnsureCreated" (same approach as the original Backend). Changing entities later
-needs EF migrations or a fresh database.
-
+| **Development** | `leader@peniel.local` / `Dev-Only-Change-Me-123!` (seeded
