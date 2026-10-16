@@ -6,7 +6,7 @@ using PenielPlaceMinistriesCSharp.Models;
 namespace PenielPlaceMinistriesCSharp.Data;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options)
+    : IdentityDbContext<ApplicationUser>(options), IDataProtectionKeyContext
 {
     public DbSet<Donor> Donors => Set<Donor>();
     public DbSet<DonationCategory> DonationCategories => Set<DonationCategory>();
